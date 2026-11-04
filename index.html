@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#181633" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="VoiceFlow" />
+  <meta name="description" content="Private iPhone voice drafting and AI-English prompt helper. No account, no API key." />
+  <title>VoiceFlow — Personal iPhone Prototype v0.2</title>
+  <style>
+    :root { color-scheme: light; --ink:#201b39; --muted:#62627a; --purple:#6751ef; --line:#e8e7f2; --bg:#f7f8fd; --card:#fff; --green:#0c7a56; }
+    * { box-sizing:border-box; }
+    html { -webkit-text-size-adjust:100%; }
+    body { margin:0; background:linear-gradient(180deg,#eeeafe 0,#f7f8fd 245px); color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    button,select,textarea { font:inherit; }
+    button { cursor:pointer; -webkit-tap-highlight-color:transparent; }
+    button:focus-visible, textarea:focus-visible, select:focus-visible { outline:3px solid #baaaff; outline-offset:2px; }
+    main { max-width:650px; padding: max(18px,env(safe-area-inset-top)) 17px calc(40px + env(safe-area-inset-bottom)); margin:0 auto; }
+    .head { display:flex; justify-content:space-between; gap:12px; align-items:center; margin:4px 0 15px; }
+    .brand { display:flex; align-items:center; gap:11px; }
+    .logo { display:grid; place-items:center; width:45px; height:45px; border-radius:15px; color:#fff; background:#4734c5; font-size:25px; box-shadow:0 7px 19px #6751ef44; }
+    h1 { font-size:23px; letter-spacing:-.7px; margin:0; line-height:1.14; }
+    .subbrand { font-size:12px; color:var(--muted); margin-top:4px; }
+    .pill { font-size:10px; white-space:nowrap; color:#4e3d9b; background:#e6e1ff; border-radius:999px; padding:8px 9px; font-weight:800; }
+    .hero { border-radius:23px; padding:19px 19px 17px; background:#20163e; color:white; box-shadow:0 15px 40px #251a4124; }
+    .eyebrow { letter-spacing:1.6px; font-size:10px; font-weight:800; color:#cabaff; }
+    .hero h2 { font-size:23px; line-height:1.22; margin:8px 0 8px; }
+    .hero p { margin:0; font-size:13px; line-height:1.6; color:#dfdbf4; }
+    .stepper { display:flex; gap:7px; margin-top:17px; }
+    .stepper span { background:#40345c; color:#e6e2f3; border-radius:10px; font-size:11px; padding:7px 9px; }
+    .panel { background:var(--card); border:1px solid var(--line); border-radius:20px; padding:16px; margin-top:14px; box-shadow:0 8px 24px #21203906; }
+    .row { display:flex; align-items:center; justify-content:space-between; gap:9px; flex-wrap:wrap; }
+    h3 { margin:0; font-size:16px; letter-spacing:-.15px; }
+    .hint { font-size:12px; line-height:1.55; color:var(--muted); margin:9px 0 11px; }
+    .language { display:flex; gap:7px; flex-wrap:wrap; }
+    .chip { background:#f3f2fb; color:#514b69; border:1px solid #e6e3f2; border-radius:999px; padding:9px 11px; font-size:12px; font-weight:700; }
+    .chip[aria-pressed="true"] { background:#e4defe; border-color:#7965ef; color:#3b278a; }
+    label { display:block; font-size:13px; font-weight:750; margin:14px 0 8px; }
+    textarea { display:block; width:100%; padding:13px; resize:vertical; min-height:125px; border:1px solid #dcdbe9; border-radius:13px; background:#fdfdff; color:#26213e; font-size:16px; line-height:1.55; }
+    textarea::placeholder { color:#9190a8; }
+    .actions { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-top:10px; }
+    .btn { display:flex; align-items:center; justify-content:center; gap:6px; border:1px solid #ddd8f8; background:#f4f1ff; color:#3e2f94; border-radius:12px; min-height:44px; padding:10px; font-size:13px; font-weight:750; }
+    .btn-primary { background:var(--purple); border-color:var(--purple); color:white; }
+    .btn-dark { background:#27203e; border-color:#27203e; color:white; }
+    .btn-outline { background:#fff; color:#4a4365; border-color:#dedce9; }
+    .btn:disabled { opacity:.48; cursor:not-allowed; }
+    .full { width:100%; }
+    .minor { display:flex; align-items:center; gap:8px; color:var(--muted); font-size:11px; line-height:1.5; margin-top:9px; }
+    select { background:#fff; border:1px solid #dad6ed; border-radius:10px; padding:10px; width:100%; min-height:43px; color:var(--ink); }
+    .tip { border-left:3px solid #b4a8fb; background:#f6f3ff; color:#4e4671; border-radius:8px; padding:10px 11px; font-size:12px; line-height:1.6; margin-top:12px; }
+    .status { color:#5a4b83; font-size:12px; min-height:19px; margin:9px 0 0; }
+    .status.ok { color:var(--green); }
+    .status.bad { color:#a83a46; }
+    .caption { font-size:11px; color:#77718a; }
+    .feature { border:1px solid #cfe8df; background:#f0fcf7; border-radius:12px; padding:12px; margin-top:13px; }
+    .feature h4 { margin:0 0 5px; font-size:13px; color:#096544; }
+    .feature p { margin:0 0 9px; font-size:12px; color:#346854; line-height:1.5; }
+    .checkline { display:flex; align-items:flex-start; gap:9px; font-size:12px; line-height:1.5; color:#55516c; margin-top:12px; }
+    .checkline input { width:19px;height:19px; flex:none; accent-color:var(--purple); margin-top:0; }
+    .mini { font-size:11px;color:#68657d;line-height:1.5;margin-top:7px; }
+
+    details { background:white; border:1px solid var(--line); border-radius:17px; padding:13px 15px; margin-top:14px; }
+    summary { font-weight:800; cursor:pointer; font-size:13px; }
+    details p,details li { color:#5e5872; font-size:12px; line-height:1.65; }
+    details ol { padding-left:19px; }
+    footer { text-align:center; font-size:11px; line-height:1.65; margin:21px 8px 0; color:#837b98; }
+    @media(max-width:350px) { .head h1{font-size:21px}.pill{font-size:9px}.hero h2{font-size:21px} .actions{gap:7px}.btn{font-size:12px} }
+  </style>
+</head>
+<body>
+  <main>
+    <header class="head">
+      <div class="brand"><div class="logo" aria-hidden="true">🎙</div><div><h1>VoiceFlow</h1><div class="subbrand">iPhone Personal Prototype · v0.2</div></div></div>
+      <span class="pill">FREE · NO API</span>
+    </header>
+
+    <section class="hero">
+      <div class="eyebrow">VOICE → TEXT → BETTER ENGLISH</div>
+      <h2>बोलिए, लिखिए, बेहतर भेजिए।</h2>
+      <p>iPhone की Dictation से मैसेज लिखें। चाहें तो ChatGPT से English सुधरवाएँ, फिर WhatsApp या दूसरी ऐप में भेजें।</p>
+      <div class="stepper"><span>1 बोलें</span><span>2 सुधारें</span><span>3 भेजें</span></div>
+    </section>
+
+    <section class="panel">
+      <div class="row"><h3>1. अपना मैसेज बोलें या लिखें</h3><span class="caption" id="count">0 अक्षर</span></div>
+      <p class="hint">टेक्स्ट बॉक्स टैप करें → iPhone Keyboard का 🎤 दबाएँ। नीचे वाला Web Mic वैकल्पिक प्रयोग है।</p>
+      <div class="language" aria-label="Voice language">
+        <button type="button" class="chip" data-lang="hi-IN" aria-pressed="true">हिंदी</button>
+        <button type="button" class="chip" data-lang="en-IN" aria-pressed="false">English</button>
+        <button type="button" class="chip" data-lang="gu-IN" aria-pressed="false">ગુજરાતી*</button>
+      </div>
+      <label for="inputText">Original Message</label>
+      <textarea id="inputText" lang="hi" placeholder="यहाँ बोलें या लिखें…\nउदाहरण: कल तक डिजाइन भेज दीजिए।" autocapitalize="sentences" spellcheck="true"></textarea>
+      <div class="actions">
+        <button class="btn" id="focusInput" type="button">⌨️ Keyboard खोलें</button>
+        <button class="btn btn-outline" id="voiceBtn" type="button">🎙 Web Mic आज़माएँ</button>
+      </div>
+      <label class="checkline" for="saveLocal"><input id="saveLocal" type="checkbox" /> इस iPhone में Draft याद रखें (Optional; default OFF)</label>
+      <div class="mini" id="savedNote">OFF रहने पर Draft सेव नहीं होगा। ON होने पर टेक्स्ट इस Browser में ही Store होगा; Settings से Clear All करके मिटा सकते हैं।</div>
+      <div class="minor">* Gujarati typing/paste समर्थित है; iPhone की Gujarati Dictation आधिकारिक रूप से उपलब्ध नहीं दिखती। Web Mic भाषा-सपोर्ट अलग हो सकता है।</div>
+      <p class="status" id="micStatus" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="panel">
+      <h3>2. English को सुधारें</h3>
+      <p class="hint">कोई Paid API इस्तेमाल नहीं होगा। Offline सफाई यहाँ होगी; असली AI Rewrite के लिए आपका ChatGPT खुलेगा।</p>
+      <div class="feature">
+        <h4>⚡ Free Instant Demo — बिना API</h4>
+        <p>आपने जो “Main Thoda late nikalunga” वाला टेस्ट किया था, उसके लिए चार तैयार translations का Demo। दूसरी पंक्तियों का AI अनुवाद नहीं होता।</p>
+        <div class="actions">
+          <button class="btn btn-outline" id="demoFillBtn" type="button">↘ टेस्ट वाक्य डालें</button>
+          <button class="btn btn-primary" id="demoTryBtn" type="button">⚡ Instant Demo</button>
+        </div>
+      </div>
+      <label for="mode">AI में कैसा मैसेज चाहिए?</label>
+      <select id="mode">
+        <option value="natural">Natural English</option>
+        <option value="professional" selected>Professional English</option>
+        <option value="polite">Polite & Friendly</option>
+        <option value="short">Short & Clear</option>
+        <option value="translate">Faithful English Translation</option>
+      </select>
+      <div class="actions">
+        <button class="btn" id="cleanBtn" type="button">✨ Basic Clean</button>
+        <button class="btn btn-primary" id="promptBtn" type="button">🤖 Copy AI Prompt</button>
+        <button class="btn btn-dark" id="chatBtn" type="button">↗ Open ChatGPT</button>
+        <button class="btn btn-outline" id="pasteBtn" type="button">📋 Paste AI Result</button>
+      </div>
+      <p id="workStatus" class="status" role="status" aria-live="polite"></p>
+      <div class="tip"><b>Fast workflow:</b> Demo के बाहर, कोई भी नया Hindi/Gujarati/Hinglish मैसेज English में बदलने के लिए ChatGPT का उपयोग करना होगा। <b>AI इस्तेमाल करने का तरीका:</b> Copy AI Prompt → Open ChatGPT → वहाँ Paste करके भेजें → English Result Copy करें → वापस यहाँ Paste AI Result दबाएँ। यह दो ऐपों के बीच मैन्युअल प्रक्रिया है।</div>
+      <label for="outputText">Ready Message (editable)</label>
+      <textarea id="outputText" lang="en" placeholder="आपका साफ किया हुआ टेक्स्ट या ChatGPT का English Result यहाँ आएगा…" spellcheck="true"></textarea>
+    </section>
+
+    <section class="panel">
+      <h3>3. जहाँ चाहें भेजें</h3>
+      <p class="hint">Copy करके WhatsApp, Instagram, Gmail या किसी भी Text Field में Paste करें। iPhone Share Sheet भी आज़मा सकते हैं।</p>
+      <div class="actions">
+        <button class="btn btn-primary" id="copyBtn" type="button">📄 Copy Message</button>
+        <button class="btn btn-dark" id="shareBtn" type="button">↗ Share</button>
+        <button class="btn btn-outline" id="waBtn" type="button">💬 WhatsApp</button>
+        <button class="btn btn-outline" id="clearBtn" type="button">🗑 Clear All</button>
+      </div>
+      <p id="sendStatus" class="status" role="status" aria-live="polite"></p>
+      <div class="minor">Clipboard और Share की सुविधा browser/security settings पर निर्भर हो सकती है। WhatsApp नहीं खुलने पर Copy करके Paste करें।</div>
+    </section>
+
+    <details>
+      <summary>🔧 iPhone पर Voice Dictation कैसे चालू करें?</summary>
+      <ol><li>Settings → General → Keyboard में जाएँ।</li><li>Enable Dictation चालू करें।</li><li>Settings → General → Keyboard → Keyboards से Hindi/English Keyboard जोड़ सकते हैं।</li><li>इस ऐप के Original Message बॉक्स में टैप करके Apple Keyboard का माइक्रोफोन दबाएँ।</li></ol>
+      <p>Language chips सिर्फ Web Mic की भाषा चुनते हैं; ये Apple Keyboard का Dictation language अपने-आप नहीं बदलते।</p>
+    </details>
+    <details>
+      <summary>🔐 Privacy और Limitations</summary>
+      <p>यह पेज कोई account, analytics, server या paid API नहीं जोड़ता। Draft Draft Save का विकल्प default OFF है; ON करने पर केवल इसी Browser में localStorage में सेव होता है। डिवाइस की Dictation Apple की processing पर निर्भर है; AI Prompt ChatGPT में आप स्वयं paste करते हैं। Web Mic चलने पर browser की speech service का उपयोग हो सकता है। इस prototype में system-wide iOS keyboard extension नहीं है।</p>
+    </details>
+    <footer>VoiceFlow v0.2 · Personal experiment only · No hidden paid features · Not affiliated with Superflow or Apple</footer>
+  </main>
+  <script>
+  (() => {
+    'use strict';
+    const $ = id => document.getElementById(id);
+    const original = $('inputText'), result = $('outputText');
+    const workStatus = $('workStatus'), micStatus = $('micStatus'), sendStatus = $('sendStatus');
+    let voiceLang = 'hi-IN', recognizer = null, listening = false;
+    const storageKey = 'voiceflow_v02_draft';
+    const flagKey = 'voiceflow_v02_save_enabled';
+    const saveOpt = $('saveLocal');
+    const mode = $('mode');
+    // Only the user can turn on draft persistence. No analytics or background sync.
+    function saveDraft() {
+      if (!saveOpt.checked) return;
+      try { localStorage.setItem(storageKey,JSON.stringify({original:original.value,result:result.value,mode:mode.value})); }
+      catch (_) { status(workStatus,'Draft Save उपलब्ध नहीं है; जरूरी मैसेज Copy करें।','bad'); }
+    }
+    try {
+      saveOpt.checked = localStorage.getItem(flagKey) === 'yes';
+      if (saveOpt.checked) {
+        const saved = JSON.parse(localStorage.getItem(storageKey)||'{}');
+        original.value = typeof saved.original==='string' ? saved.original : '';
+        result.value = typeof saved.result==='string' ? saved.result : '';
+        if (Array.from(mode.options).some(opt=>opt.value===saved.mode)) mode.value=saved.mode;
+      }
+    } catch (_) { saveOpt.checked=false; }
+    saveOpt.addEventListener('change',()=>{
+      try {
+        if (saveOpt.checked) { localStorage.setItem(flagKey,'yes'); saveDraft(); }
+        else { localStorage.removeItem(flagKey); localStorage.removeItem(storageKey); }
+      } catch (_) { saveOpt.checked=false; }
+      $('savedNote').textContent = saveOpt.checked ? 'Draft इस iPhone के Browser में Save हो रहा है। संवेदनशील मैसेज होने पर OFF कर दें।' : 'OFF: Draft सेव नहीं होगा। इस Version का पिछला Saved Draft भी मिटा दिया गया है।';
+    });
+    [original,result].forEach(node=>node.addEventListener('input',saveDraft));
+    mode.addEventListener('change',saveDraft);
+    const knownPhrase = /^main\s+thoda\s+late\s+nikalunga[.!?\s]*$/i;
+    const demoEnglish = {
+      natural: "I'll leave a little later.",
+      professional: 'I will be leaving a little later.',
+      polite: "Just to let you know, I'll be leaving a little later.",
+      short: "I'll leave a bit later.",
+      translate: 'I will leave a little later.'
+    };
+    function runOfflineDemo() {
+      if (!knownPhrase.test(original.value.trim())) {
+        status(workStatus,'Instant Demo सिर्फ “Main Thoda late nikalunga” के लिए है। दूसरे वाक्य के लिए Copy AI Prompt इस्तेमाल करें।','bad');
+        return;
+      }
+      result.value=demoEnglish[mode.value];
+      saveDraft();
+      status(workStatus,'यह पहले से लिखा हुआ DEMO Translation है—AI model नहीं चला।','ok');
+    }
+    $('demoFillBtn').addEventListener('click',()=>{
+      original.value='Main Thoda late nikalunga';
+      result.value=''; updateCount(); saveDraft();
+      status(workStatus,'Test वाक्य भर दिया। Tone चुनें, फिर Instant Demo दबाएँ।','ok');
+    });
+    $('demoTryBtn').addEventListener('click',runOfflineDemo);
+
+
+    function status(el, message, kind='') {
+      el.textContent = message;
+      el.className = 'status' + (kind ? ' ' + kind : '');
+    }
+    function messageText() { return (result.value || original.value).trim(); }
+    function updateCount() { $('count').textContent = [...original.value].length + ' अक्षर'; }
+    original.addEventListener('input', updateCount); updateCount();
+    document.querySelectorAll('[data-lang]').forEach(el => {
+      el.addEventListener('click', () => {
+        voiceLang = el.dataset.lang;
+        document.querySelectorAll('[data-lang]').forEach(b => b.setAttribute('aria-pressed',String(b === el)));
+        original.lang = voiceLang.split('-')[0];
+        status(micStatus, voiceLang === 'gu-IN' ? 'Gujarati Web Mic उपलब्ध होने की गारंटी नहीं है; टाइप या Paste कर सकते हैं।' : 'Web Mic भाषा चुनी गई। Apple Keyboard भाषा अलग से चुनें।');
+      });
+    });
+    $('focusInput').addEventListener('click',() => {
+      original.focus();
+      status(micStatus, 'अब Keyboard में 🎤 Dictation दबाएँ। iPhone microphone इस बटन से सीधे चालू नहीं होता।');
+    });
+    $('voiceBtn').addEventListener('click', () => {
+      if (listening && recognizer) {
+        recognizer.stop(); return;
+      }
+      const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!Recognition) {
+        status(micStatus,'इस Safari में Web Speech API उपलब्ध नहीं है। Original Message में Apple Keyboard 🎤 इस्तेमाल करें।','bad');
+        return;
+      }
+      try {
+        recognizer = new Recognition();
+        recognizer.lang = voiceLang;
+        recognizer.continuous = false;
+        recognizer.interimResults = false;
+        recognizer.maxAlternatives = 1;
+        recognizer.onstart = () => { listening = true; $('voiceBtn').textContent = '⏹ Stop Web Mic'; status(micStatus,'सुन रहा है… बोलिए।'); };
+        recognizer.onresult = event => {
+          let words = '';
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            if (event.results[i].isFinal) words += event.results[i][0].transcript;
+          }
+          if (words) { original.value = [original.value.trim(),words.trim()].filter(Boolean).join(' '); updateCount(); saveDraft(); status(micStatus,'बोला हुआ टेक्स्ट जोड़ा गया।','ok'); }
+        };
+        recognizer.onerror = event => {status(micStatus, 'Web Mic काम नहीं कर पाया (' + (event.error || 'unknown') + '). Apple Keyboard 🎤 आज़माएँ।','bad');};
+        recognizer.onend = () => { listening = false; $('voiceBtn').textContent = '🎙 Web Mic आज़माएँ'; };
+        recognizer.start();
+      } catch (_) { listening = false; status(micStatus,'Web Mic शुरू नहीं हुआ। Keyboard 🎤 इस्तेमाल करें।','bad'); }
+    });
+    function basicClean(source) {
+      let t = source.replace(/\r\n?/g,'\n').split('\n').map(x=>x.replace(/[\t ]+/g,' ').trim()).join('\n').trim();
+      t = t.replace(/\s+([,.;!?])/g,'$1').replace(/([,;!?])([^\s\n])/g,'$1 $2');
+      t = t.replace(/(^|[.!?]\s+)([a-z])/g,(_,a,b)=>a+b.toUpperCase());
+      t = t.replace(/\bi\b/g,'I');
+      return t;
+    }
+    $('cleanBtn').addEventListener('click',()=>{
+      if (!original.value.trim()) return status(workStatus,'पहले कोई टेक्स्ट बोलें या लिखें।','bad');
+      result.value = basicClean(original.value); saveDraft();
+      const indic = /[\u0900-\u097F\u0A80-\u0AFF]/.test(original.value);
+      status(workStatus, indic ? 'Basic Clean हुआ। यह Translation नहीं है—English के लिए AI Prompt इस्तेमाल करें।' : 'Basic punctuation, spacing और capitalization साफ किया गया। यह AI rewrite नहीं है।','ok');
+    });
+    function aiPrompt(text) {
+      const modes = {
+        natural:'Rewrite as clear, natural English.',
+        professional:'Rewrite as concise, professional English suitable for a business message.',
+        polite:'Rewrite as polite, warm, friendly English.',
+        short:'Rewrite as short, simple, clear English.',
+        translate:'Translate faithfully into English, preserving facts and intent.'
+      };
+      return [
+        'You are helping me draft a message. ' + modes[$('mode').value],
+        'The source may be in Hindi, Gujarati, Hinglish, or English.',
+        'Preserve the original meaning, dates, numbers, names and requests. Do not invent details.',
+        'Return ONLY the final English message without quotes, explanation or extra formatting.',
+        '', 'MESSAGE:', text
+      ].join('\n');
+    }
+    async function copyText(s) {
+      if (!s) return false;
+      try {
+        if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(s); return true; }
+      } catch(_) { /* fallback */ }
+      const el = document.createElement('textarea');
+      el.value = s; el.style.cssText = 'position:fixed;top:0;left:0;opacity:0;';
+      document.body.append(el); el.select(); el.setSelectionRange(0,el.value.length);
+      let ok = false;
+      try {ok = document.execCommand('copy');} catch(_) {}
+      el.remove(); return ok;
+    }
+    $('promptBtn').addEventListener('click', async()=>{
+      if (!original.value.trim()) return status(workStatus,'पहले Original Message लिखें।','bad');
+      const ok = await copyText(aiPrompt(original.value.trim()));
+      status(workStatus,ok ? 'AI Prompt Copy हो गया। अब Open ChatGPT → Paste → Send करें।' : 'Copy नहीं हुआ। Browser में Clipboard अनुमति जाँचें।',ok?'ok':'bad');
+    });
+    $('chatBtn').addEventListener('click',()=>{
+      window.open('https://chatgpt.com/','_blank','noopener,noreferrer');
+      status(workStatus,'ChatGPT में कॉपी किया हुआ AI Prompt Paste करके Send करें।');
+    });
+    $('pasteBtn').addEventListener('click', async()=>{
+      try {
+        if (!navigator.clipboard || !window.isSecureContext) throw new Error('unavailable');
+        const pasted = await navigator.clipboard.readText();
+        if (!pasted.trim()) return status(workStatus,'Clipboard खाली है। ChatGPT से Result पहले Copy करें।','bad');
+        result.value = pasted.trim(); saveDraft();
+        status(workStatus,'AI Result यहाँ आ गया। भेजने से पहले जाँच लें।','ok');
+      } catch(_) {
+        result.focus();
+        status(workStatus,'Automatic Paste नहीं हो सका। Ready Message बॉक्स में long-press → Paste करें।','bad');
+      }
+    });
+    $('copyBtn').addEventListener('click',async()=>{
+      const s = messageText();
+      if (!s) return status(sendStatus,'पहले कोई मैसेज तैयार करें।','bad');
+      const ok = await copyText(s);
+      status(sendStatus,ok ? 'मैसेज Copy हो गया। अब दूसरी ऐप में Paste करें।':'Copy blocked. Ready Message को select करके मैन्युअली Copy करें।',ok?'ok':'bad');
+    });
+    $('shareBtn').addEventListener('click',async()=>{
+      const s = messageText();
+      if (!s) return status(sendStatus,'पहले कोई मैसेज तैयार करें।','bad');
+      if (!navigator.share) return status(sendStatus,'Share उपलब्ध नहीं है। Copy Message दबाएँ।','bad');
+      try {await navigator.share({text:s,title:'VoiceFlow message'});status(sendStatus,'Share Sheet बंद हुई। भेजना चुनी हुई ऐप पर निर्भर है।');}
+      catch(e) {if(e.name !== 'AbortError')status(sendStatus,'Share नहीं हुआ। Copy Message आज़माएँ।','bad');}
+    });
+    $('waBtn').addEventListener('click',()=>{
+      const s = messageText();
+      if (!s) return status(sendStatus,'पहले कोई मैसेज तैयार करें।','bad');
+      window.open('https://wa.me/?text='+encodeURIComponent(s),'_blank','noopener,noreferrer');
+      status(sendStatus,'WhatsApp खुलने पर recipient चुनें और मैसेज भेजने से पहले पढ़ लें।');
+    });
+    $('clearBtn').addEventListener('click',()=>{
+      if (!original.value && !result.value) return;
+      if (!window.confirm('दोनों Text Boxes खाली करें?')) return;
+      original.value='';result.value='';updateCount();
+      try{localStorage.removeItem(storageKey);}catch(_){}
+      status(sendStatus,'दोनों Text Boxes खाली किए गए।','ok');status(workStatus,'');status(micStatus,'');
+    });
+  })();
+  </script>
+</body>
+</html>
