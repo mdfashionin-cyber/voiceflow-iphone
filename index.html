@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="VoiceFlow" />
   <meta name="description" content="Private iPhone voice drafting and AI-English prompt helper. No account, no API key." />
-  <title>VoiceFlow — Personal iPhone Prototype v0.2</title>
+  <title>VoiceFlow — Personal iPhone Prototype v0.3</title>
   <style>
     :root { color-scheme: light; --ink:#201b39; --muted:#62627a; --purple:#6751ef; --line:#e8e7f2; --bg:#f7f8fd; --card:#fff; --green:#0c7a56; }
     * { box-sizing:border-box; }
@@ -72,7 +72,7 @@
 <body>
   <main>
     <header class="head">
-      <div class="brand"><div class="logo" aria-hidden="true">🎙</div><div><h1>VoiceFlow</h1><div class="subbrand">iPhone Personal Prototype · v0.2</div></div></div>
+      <div class="brand"><div class="logo" aria-hidden="true">🎙</div><div><h1>VoiceFlow</h1><div class="subbrand">iPhone Personal Prototype · v0.3</div></div></div>
       <span class="pill">FREE · NO API</span>
     </header>
 
@@ -85,7 +85,7 @@
 
     <section class="panel">
       <div class="row"><h3>1. अपना मैसेज बोलें या लिखें</h3><span class="caption" id="count">0 अक्षर</span></div>
-      <p class="hint">टेक्स्ट बॉक्स टैप करें → iPhone Keyboard का 🎤 दबाएँ। नीचे वाला Web Mic वैकल्पिक प्रयोग है।</p>
+      <p class="hint">टेक्स्ट बॉक्स में टैप करें और Apple Keyboard का 🎤 दबाएँ। बोलने के बाद शब्द ज़रूर जाँचें—यह ऐप Apple Dictation की पहचान अपने-आप नहीं सुधार सकती।</p>
       <div class="language" aria-label="Voice language">
         <button type="button" class="chip" data-lang="hi-IN" aria-pressed="true">हिंदी</button>
         <button type="button" class="chip" data-lang="en-IN" aria-pressed="false">English</button>
@@ -101,6 +101,7 @@
       <div class="mini" id="savedNote">OFF रहने पर Draft सेव नहीं होगा। ON होने पर टेक्स्ट इस Browser में ही Store होगा; Settings से Clear All करके मिटा सकते हैं।</div>
       <div class="minor">* Gujarati typing/paste समर्थित है; iPhone की Gujarati Dictation आधिकारिक रूप से उपलब्ध नहीं दिखती। Web Mic भाषा-सपोर्ट अलग हो सकता है।</div>
       <p class="status" id="micStatus" role="status" aria-live="polite"></p>
+      <p class="status" id="voiceReview" aria-live="polite"></p>
     </section>
 
     <section class="panel">
@@ -108,7 +109,7 @@
       <p class="hint">कोई Paid API इस्तेमाल नहीं होगा। Offline सफाई यहाँ होगी; असली AI Rewrite के लिए आपका ChatGPT खुलेगा।</p>
       <div class="feature">
         <h4>⚡ Free Instant Demo — बिना API</h4>
-        <p>आपने जो “Main Thoda late nikalunga” वाला टेस्ट किया था, उसके लिए चार तैयार translations का Demo। दूसरी पंक्तियों का AI अनुवाद नहीं होता।</p>
+        <p>पहले से चुने हुए कुछ टेस्ट वाक्यों के लिए Offline Example। यह कोई AI Translation Engine नहीं है। अलग वाक्यों के लिए Shortcuts या ChatGPT चुनें।</p>
         <div class="actions">
           <button class="btn btn-outline" id="demoFillBtn" type="button">↘ टेस्ट वाक्य डालें</button>
           <button class="btn btn-primary" id="demoTryBtn" type="button">⚡ Instant Demo</button>
@@ -122,14 +123,16 @@
         <option value="short">Short & Clear</option>
         <option value="translate">Faithful English Translation</option>
       </select>
+      <button class="btn btn-primary full" id="shortcutBtn" type="button" style="margin-top:12px; min-height:52px">⚡ Apple Shortcut से English</button>
+      <div class="mini">पहले iPhone Shortcuts में “VoiceFlow English” नाम का Shortcut बनाना होगा। उपलब्ध AI model और आपकी सेटिंग्स पर निर्भर।</div>
       <div class="actions">
+        <button class="btn btn-dark" id="fastChatBtn" type="button">↗ Copy + Open ChatGPT</button>
+        <button class="btn btn-outline" id="pasteBtn" type="button">📋 English Result Paste</button>
         <button class="btn" id="cleanBtn" type="button">✨ Basic Clean</button>
-        <button class="btn btn-primary" id="promptBtn" type="button">🤖 Copy AI Prompt</button>
-        <button class="btn btn-dark" id="chatBtn" type="button">↗ Open ChatGPT</button>
-        <button class="btn btn-outline" id="pasteBtn" type="button">📋 Paste AI Result</button>
+        <button class="btn btn-outline" id="promptBtn" type="button">📄 केवल Prompt Copy</button>
       </div>
       <p id="workStatus" class="status" role="status" aria-live="polite"></p>
-      <div class="tip"><b>Fast workflow:</b> Demo के बाहर, कोई भी नया Hindi/Gujarati/Hinglish मैसेज English में बदलने के लिए ChatGPT का उपयोग करना होगा। <b>AI इस्तेमाल करने का तरीका:</b> Copy AI Prompt → Open ChatGPT → वहाँ Paste करके भेजें → English Result Copy करें → वापस यहाँ Paste AI Result दबाएँ। यह दो ऐपों के बीच मैन्युअल प्रक्रिया है।</div>
+      <div class="tip"><b>Fast workflow:</b> Shortcuts तैयार है तो “Apple Shortcut से English” दबाएँ → Shortcut का AI उत्तर Clipboard में Copy होगा → VoiceFlow में लौटकर “English Result Paste” दबाएँ। यदि Shortcuts उपलब्ध नहीं है तो “Copy + Open ChatGPT” दबाएँ → वहाँ Paste और Send करें → उत्तर Copy करके यहाँ Paste करें।</div>
       <label for="outputText">Ready Message (editable)</label>
       <textarea id="outputText" lang="en" placeholder="आपका साफ किया हुआ टेक्स्ट या ChatGPT का English Result यहाँ आएगा…" spellcheck="true"></textarea>
     </section>
@@ -152,11 +155,23 @@
       <ol><li>Settings → General → Keyboard में जाएँ।</li><li>Enable Dictation चालू करें।</li><li>Settings → General → Keyboard → Keyboards से Hindi/English Keyboard जोड़ सकते हैं।</li><li>इस ऐप के Original Message बॉक्स में टैप करके Apple Keyboard का माइक्रोफोन दबाएँ।</li></ol>
       <p>Language chips सिर्फ Web Mic की भाषा चुनते हैं; ये Apple Keyboard का Dictation language अपने-आप नहीं बदलते।</p>
     </details>
+    <details id="shortcutHelp">
+      <summary>⚡ Apple Shortcuts सेटअप — सिर्फ एक बार</summary>
+      <ol>
+        <li>iPhone की <b>Shortcuts</b> ऐप खोलें → <b>+</b> → नाम ठीक <b>VoiceFlow English</b> रखें।</li>
+        <li><b>Add Action</b> में <b>Use Model</b> खोजें। Apple Intelligence सक्षम हो तो <b>On-Device</b> model चुनें; जरूरत के अनुसार Cloud या ChatGPT Extension भी चुन सकते हैं।</li>
+        <li>Use Model के Prompt/Input field में नीले variable से <b>Shortcut Input</b> डालें। हमारी ऐप पूरा English-Rewrite निर्देश इसी Input में भेजेगी।</li>
+        <li>एक और Action <b>Copy to Clipboard</b> जोड़ें; इसमें Use Model के <b>Response</b> को चुनें। चाहें तो <b>Show Result</b> भी जोड़ें। Shortcut Save करें।</li>
+        <li>VoiceFlow में अपनी बात लिखें → <b>Apple Shortcut से English</b> दबाएँ। iOS अनुमति पूछे तो स्वीकार करें। Shortcut चलने के बाद वापस VoiceFlow आकर <b>English Result Paste</b> दबाएँ।</li>
+      </ol>
+      <p><b>सीमा:</b> यह Native Keyboard नहीं है। Apple Intelligence सभी iPhone/भाषाओं में नहीं मिलता। किसी model को select करना और आवश्यक permissions देना आपके हाथ में है। Model गलत English भी बना सकता है—भेजने से पहले जाँचें।</p>
+      <p><a href="https://support.apple.com/en-lamr/guide/iphone/iph78c41eaf8/ios" target="_blank" rel="noopener">Apple की Use Model सहायता</a> · <a href="https://support.apple.com/en-ie/guide/shortcuts/apd624386f42/ios" target="_blank" rel="noopener">Apple Shortcuts URL जानकारी</a></p>
+    </details>
     <details>
       <summary>🔐 Privacy और Limitations</summary>
-      <p>यह पेज कोई account, analytics, server या paid API नहीं जोड़ता। Draft Draft Save का विकल्प default OFF है; ON करने पर केवल इसी Browser में localStorage में सेव होता है। डिवाइस की Dictation Apple की processing पर निर्भर है; AI Prompt ChatGPT में आप स्वयं paste करते हैं। Web Mic चलने पर browser की speech service का उपयोग हो सकता है। इस prototype में system-wide iOS keyboard extension नहीं है।</p>
+      <p>यह पेज कोई account, analytics, server या paid API नहीं जोड़ता। Draft Draft Save का विकल्प default OFF है; ON करने पर केवल इसी Browser में localStorage में सेव होता है। डिवाइस की Dictation Apple की processing पर निर्भर है; AI Prompt तभी ChatGPT या iOS Shortcuts तक जाता है जब आप संबंधित बटन दबाते हैं। Web Mic चलने पर browser की speech service का उपयोग हो सकता है। Shortcuts में चुने गए Cloud/ChatGPT Model आपके टेक्स्ट को उनकी सेवा तक भेज सकते हैं। इस prototype में system-wide iOS keyboard extension नहीं है।</p>
     </details>
-    <footer>VoiceFlow v0.2 · Personal experiment only · No hidden paid features · Not affiliated with Superflow or Apple</footer>
+    <footer>VoiceFlow v0.3 · Personal experiment only · No hidden paid features · Not affiliated with Superflow or Apple</footer>
   </main>
   <script>
   (() => {
@@ -165,7 +180,7 @@
     const original = $('inputText'), result = $('outputText');
     const workStatus = $('workStatus'), micStatus = $('micStatus'), sendStatus = $('sendStatus');
     let voiceLang = 'hi-IN', recognizer = null, listening = false;
-    const storageKey = 'voiceflow_v02_draft';
+    const storageKey = 'voiceflow_v02_draft'; // keep existing saved drafts across updates
     const flagKey = 'voiceflow_v02_save_enabled';
     const saveOpt = $('saveLocal');
     const mode = $('mode');
@@ -193,22 +208,33 @@
     });
     [original,result].forEach(node=>node.addEventListener('input',saveDraft));
     mode.addEventListener('change',saveDraft);
-    const knownPhrase = /^main\s+thoda\s+late\s+nikalunga[.!?\s]*$/i;
-    const demoEnglish = {
-      natural: "I'll leave a little later.",
-      professional: 'I will be leaving a little later.',
-      polite: "Just to let you know, I'll be leaving a little later.",
-      short: "I'll leave a bit later.",
-      translate: 'I will leave a little later.'
-    };
+    // Only exact, intentionally reviewed phrases. Do not guess garbled dictation.
+    function keyPhrase(input) {
+      return input.normalize('NFKC').toLowerCase().replace(/[.!?।,]+/g,'').replace(/\s+/g,' ').trim();
+    }
+    const examples = Object.freeze({
+      'main thoda late nikalunga': {
+        natural:"I'll leave a little later.", professional:'I will be leaving a little later.',
+        polite:"Just to let you know, I'll be leaving a little later.", short:"I'll leave a bit later.", translate:'I will leave a little later.'
+      },
+      'मैं बाहर मिलता हूँ आपको आप निकलो': {
+        natural:"Go ahead. I'll meet you outside.", professional:"Please go ahead. I'll meet you outside.",
+        polite:"Please go ahead; I'll meet you outside.", short:"I'll meet you outside. Go ahead.", translate:"I'll meet you outside. Please go ahead."
+      },
+      'main yaha se bahar jaunga': {
+        natural:"I'll head outside from here.", professional:"I will go outside from here.",
+        polite:"I'll head outside from here.", short:"I'll head outside.", translate:"I will go outside from here."
+      }
+    });
     function runOfflineDemo() {
-      if (!knownPhrase.test(original.value.trim())) {
-        status(workStatus,'Instant Demo सिर्फ “Main Thoda late nikalunga” के लिए है। दूसरे वाक्य के लिए Copy AI Prompt इस्तेमाल करें।','bad');
+      const candidate = examples[keyPhrase(original.value)];
+      if (!candidate) {
+        status(workStatus,'यह Offline Example केवल 3 चुने हुए वाक्यों पर काम करता है। दूसरे वाक्यों के लिए AI Shortcut या ChatGPT इस्तेमाल करें।','bad');
         return;
       }
-      result.value=demoEnglish[mode.value];
+      result.value=candidate[mode.value];
       saveDraft();
-      status(workStatus,'यह पहले से लिखा हुआ DEMO Translation है—AI model नहीं चला।','ok');
+      status(workStatus,'यह पहले से तैयार उदाहरण है, AI translation नहीं। भेजने से पहले अर्थ जाँचें।','ok');
     }
     $('demoFillBtn').addEventListener('click',()=>{
       original.value='Main Thoda late nikalunga';
@@ -217,14 +243,23 @@
     });
     $('demoTryBtn').addEventListener('click',runOfflineDemo);
 
-
     function status(el, message, kind='') {
       el.textContent = message;
       el.className = 'status' + (kind ? ' ' + kind : '');
     }
     function messageText() { return (result.value || original.value).trim(); }
     function updateCount() { $('count').textContent = [...original.value].length + ' अक्षर'; }
-    original.addEventListener('input', updateCount); updateCount();
+    original.addEventListener('input', () => {
+      updateCount();
+      if (result.value) {
+        result.value = ''; // Don't accidentally send a translation of a previous message.
+        saveDraft();
+        status(workStatus,'Original Message बदला गया। पुराने English Result को सुरक्षित रूप से खाली किया है।');
+      }
+      const garbled = /\bmay\s+rha\s+she\b|\brha\s+she\b/i.test(original.value);
+      status($('voiceReview'), garbled ? '⚠️ Dictation में गलत शब्द दिख रहे हैं। कृपया पहले Original Message सही करें। हम अर्थ का अनुमान नहीं लगा रहे।' : '');
+    });
+    updateCount();
     document.querySelectorAll('[data-lang]').forEach(el => {
       el.addEventListener('click', () => {
         voiceLang = el.dataset.lang;
@@ -258,7 +293,7 @@
           for (let i = event.resultIndex; i < event.results.length; i++) {
             if (event.results[i].isFinal) words += event.results[i][0].transcript;
           }
-          if (words) { original.value = [original.value.trim(),words.trim()].filter(Boolean).join(' '); updateCount(); saveDraft(); status(micStatus,'बोला हुआ टेक्स्ट जोड़ा गया।','ok'); }
+          if (words) { original.value = [original.value.trim(),words.trim()].filter(Boolean).join(' '); result.value=''; original.dispatchEvent(new Event('input',{bubbles:true})); saveDraft(); status(micStatus,'बोला हुआ टेक्स्ट जोड़ा गया। कृपया शब्द जाँचें।','ok'); }
         };
         recognizer.onerror = event => {status(micStatus, 'Web Mic काम नहीं कर पाया (' + (event.error || 'unknown') + '). Apple Keyboard 🎤 आज़माएँ।','bad');};
         recognizer.onend = () => { listening = false; $('voiceBtn').textContent = '🎙 Web Mic आज़माएँ'; };
@@ -276,7 +311,7 @@
       if (!original.value.trim()) return status(workStatus,'पहले कोई टेक्स्ट बोलें या लिखें।','bad');
       result.value = basicClean(original.value); saveDraft();
       const indic = /[\u0900-\u097F\u0A80-\u0AFF]/.test(original.value);
-      status(workStatus, indic ? 'Basic Clean हुआ। यह Translation नहीं है—English के लिए AI Prompt इस्तेमाल करें।' : 'Basic punctuation, spacing और capitalization साफ किया गया। यह AI rewrite नहीं है।','ok');
+      status(workStatus, indic ? 'Basic Clean हुआ। यह Translation नहीं है—AI Shortcut या ChatGPT चुनें।' : 'Basic punctuation, spacing और capitalization साफ किया गया। यह AI rewrite नहीं है।','ok');
     });
     function aiPrompt(text) {
       const modes = {
@@ -311,9 +346,21 @@
       const ok = await copyText(aiPrompt(original.value.trim()));
       status(workStatus,ok ? 'AI Prompt Copy हो गया। अब Open ChatGPT → Paste → Send करें।' : 'Copy नहीं हुआ। Browser में Clipboard अनुमति जाँचें।',ok?'ok':'bad');
     });
-    $('chatBtn').addEventListener('click',()=>{
-      window.open('https://chatgpt.com/','_blank','noopener,noreferrer');
-      status(workStatus,'ChatGPT में कॉपी किया हुआ AI Prompt Paste करके Send करें।');
+    $('fastChatBtn').addEventListener('click', async()=>{
+      if (!original.value.trim()) return status(workStatus,'पहले Original Message बोलें या लिखें।','bad');
+      const ok = await copyText(aiPrompt(original.value.trim()));
+      if (!ok) return status(workStatus,'Clipboard में Prompt Copy नहीं हुआ। “केवल Prompt Copy” फिर आज़माएँ।','bad');
+      status(workStatus,'Prompt Copy हुआ। ChatGPT में Paste करके Send दबाएँ।','ok');
+      // Navigate the same tab to avoid iPhone Safari popup blocking after clipboard permission.
+      window.location.assign('https://chatgpt.com/');
+    });
+    $('shortcutBtn').addEventListener('click',()=>{
+      if (!original.value.trim()) return status(workStatus,'पहले Original Message बोलें या लिखें।','bad');
+      const prompt = aiPrompt(original.value.trim());
+      if (prompt.length > 1600) return status(workStatus,'मैसेज Shortcut URL के लिए लंबा है। “Copy + Open ChatGPT” इस्तेमाल करें।','bad');
+      status(workStatus,'iPhone Shortcuts खुलने पर “VoiceFlow English” Run होगा—यह Shortcut पहले बना होना चाहिए।','ok');
+      // Apple's supported Shortcuts URL scheme; no key, background call or server.
+      window.location.href='shortcuts://run-shortcut?name=VoiceFlow%20English&input=text&text='+encodeURIComponent(prompt);
     });
     $('pasteBtn').addEventListener('click', async()=>{
       try {
@@ -321,7 +368,7 @@
         const pasted = await navigator.clipboard.readText();
         if (!pasted.trim()) return status(workStatus,'Clipboard खाली है। ChatGPT से Result पहले Copy करें।','bad');
         result.value = pasted.trim(); saveDraft();
-        status(workStatus,'AI Result यहाँ आ गया। भेजने से पहले जाँच लें।','ok');
+        status(workStatus,'English Result यहाँ आ गया। भेजने से पहले जाँच लें।','ok');
       } catch(_) {
         result.focus();
         status(workStatus,'Automatic Paste नहीं हो सका। Ready Message बॉक्स में long-press → Paste करें।','bad');
